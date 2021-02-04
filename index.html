@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<h2>JSON based weather API demo.</h2>
+
+<p id="demo"></p>
+<p id="pogoda"></p>
+<div class="mypanel"></div>
+<table id="tblDni" border=1 class="table table-dark" style="width: 980px">
+    <tr>
+        <th>    </th>
+        <th>Day 1</th>
+        <th>Day 2</th>
+        <th>Day 3</th>
+        <th>Day 4</th>
+        <th>Day 5</th>
+        <th>Day 6</th>
+    </tr>
+
+</table>
+
+<script>
+
+    var getJSON = function(url, callback) {
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+
+        xhr.onload = function() {
+
+            var status = xhr.status;
+
+            if (status == 200) {
+                callback(null, xhr.response);
+            } else {
+                callback(status);
+            }
+        };
+
+        xhr.send();
+    };
+    var dni = [];
+    var temp = [];
+    var date = [];
+    var weather = [];
+    var pressure = [];
+    var w_state = [];
+    var wind = [];
+    var humidity = [];
+    //var location = '44418';
+
+    getJSON('https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/44418/',  function(err, data) {
+        if (err != null) {
+            console.error(err);
+        } else {
+            var table = document.getElementById('tblDni');
+
+            var tr_0 = document.createElement('tr');
+            var tr_1 = document.createElement('tr');
+            var tr_2 = document.createElement('tr');
+            var tr_3 = document.createElement('tr');
+            var tr_4 = document.createElement('tr');
+
+            for(var i =-1; i<data.consolidated_weather.length;i++) {
+                if(i>=0) {
+                    var obj = {
+                        'date': data.consolidated_weather[i].applicable_date,
+                        'weather': data.consolidated_weather[i].weather_state_name,
+                        'temp': data.consolidated_weather[i].the_temp,
+                        'pressure': data.consolidated_weather[i].air_pressure,
+                        'w_state': data.consolidated_weather[i].weather_state_abbr
+                    }
+
+                    dni.push(obj);
+                    temp.push(obj.temp);
+                    date.push(obj.date);
+                    weather.push(obj.weather);
+                    pressure.push(obj.pressure);
+                    w_state.push(obj.w_state);
+                }
+                let td_0 = document.createElement('td');
+                let td_1 = document.createElement('td');
+                let td_2 = document.createElement('td');
+                let td_3 = document.createElement('td');
+                let td_4 = document.createElement('td');
+                var text_0,
+                    text_1,
+                    text_2,
+                    text_3,
+                    text_4;
+
+                if(i<0){
+                    text_0 = document.createTextNode("  ");
+                    text_1 = document.createTextNode("Date: ");
+                    text_2 = document.createTextNode("Weather: ");
+                    text_3 = document.createTextNode("Temperature: ");
+                    text_4 = document.createTextNode("Pressure: ");
+                } else {
+
+                text_1 = document.createTextNode(date[i]);
+                text_2 = document.createTextNode(weather[i]);
+                text_3 = document.createTextNode(temp[i].toFixed(2)+" C");
+                text_4 = document.createTextNode(pressure[i]+" hPa");
+                }
+                if(i<0){
+                    td_0.innerHTML="";
+                } else {
+                    td_0.innerHTML = "<img src = \'https://www.metaweather.com//static/img/weather/" +w_state[i] +".svg\' width=\'32px\'>";
+                }
+                td_1.appendChild(text_1);
+                td_2.appendChild(text_2);
+                td_3.appendChild(text_3);
+                td_4.appendChild(text_4);
+
+                tr_0.appendChild(td_0);
+                tr_1.appendChild(td_1);
+                tr_2.appendChild(td_2);
+                tr_3.appendChild(td_3);
+                tr_4.appendChild(td_4);
+
+                table.appendChild(tr_0);
+                table.appendChild(tr_1);
+                table.appendChild(tr_2);
+                table.appendChild(tr_3);
+                table.appendChild(tr_4);
+
+                document.body.appendChild(table);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
